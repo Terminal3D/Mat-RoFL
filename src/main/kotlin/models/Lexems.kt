@@ -7,5 +7,11 @@ enum class Lexems {
     LIST,
     LBR,
     RBR,
-    EOL
+    EOL;
+
+    data class Config(
+        val states: Int,
+        val transitions: Int,
+        val acceptingStates: Int
+    )
 }
