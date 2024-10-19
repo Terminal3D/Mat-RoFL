@@ -11,10 +11,10 @@ repositories {
 
 dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
-//    implementation("net.automatalib:automata-util:0.11.0")
-//    implementation("net.automatalib:automata-core:0.11.0")
-//    implementation("net.automatalib:automata-dot-visualizer:0.11.0")
-//    implementation("net.automatalib.distribution:automata-distribution:0.11.0")
+    implementation("net.automatalib:automata-util:0.11.0")
+    implementation("net.automatalib:automata-core:0.11.0")
+    implementation("net.automatalib:automata-dot-visualizer:0.11.0")
+    implementation("net.automatalib.distribution:automata-distribution:0.11.0")
     implementation("dk.brics:automaton:1.12-4")
 
 }

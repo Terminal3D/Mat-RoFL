@@ -7,7 +7,8 @@ enum class Lexems {
     LIST,
     LBR,
     RBR,
-    EOL;
+    EOL,
+    DOT;
 
     data class Config(
         val states: Int,

@@ -2,11 +2,12 @@ package org.example.models
 
 import dk.brics.automaton.Automaton
 import java.util.*
+import kotlin.math.max
 import kotlin.random.Random
 
 data class MATAutomaton(
     val automaton: Automaton,
-    val config: MATAutomaton.Config
+    val config: MATAutomaton.Config,
 ) {
     data class Config(
         val mode: GeneratorMode,
@@ -22,37 +23,43 @@ data class MATAutomaton(
                 return when (mode.lowercase(Locale.getDefault())) {
                     "easy" -> {
                         val eolAlphabet = getEolAlphabet(GeneratorMode.EASY, alphabet)
+                        val finalAlphabet = alphabet - eolAlphabet
+                        val maxLexemLength = Random.nextInt(3, 7)
                         Config(
                             mode = GeneratorMode.EASY,
-                            maxParentheses = Random.nextInt(1, 10),
-                            maxLexemLength = Random.nextInt(5, 15),
+                            maxParentheses = Random.nextInt(1,3),
+                            maxLexemLength = maxLexemLength,
                             eolAlphabet = eolAlphabet,
-                            alphabet = alphabet - eolAlphabet,
-                            lexemSizeMap = generateLexemSizesMap(GeneratorMode.EASY),
+                            alphabet = finalAlphabet,
+                            lexemSizeMap = generateLexemSizesMap(GeneratorMode.EASY, finalAlphabet, maxLexemLength),
                         )
                     }
 
                     "normal" -> {
                         val eolAlphabet = getEolAlphabet(GeneratorMode.NORMAL, alphabet)
+                        val finalAlphabet = alphabet - eolAlphabet
+                        val maxLexemLength = Random.nextInt(7, 10)
                         Config(
                             mode = GeneratorMode.NORMAL,
-                            maxParentheses = Random.nextInt(1, 10),
-                            maxLexemLength = Random.nextInt(5, 15),
+                            maxParentheses = Random.nextInt(3, 5),
+                            maxLexemLength = maxLexemLength,
                             eolAlphabet = eolAlphabet,
-                            alphabet = alphabet - eolAlphabet,
-                            lexemSizeMap = generateLexemSizesMap(GeneratorMode.NORMAL),
+                            alphabet = finalAlphabet,
+                            lexemSizeMap = generateLexemSizesMap(GeneratorMode.NORMAL, finalAlphabet, maxLexemLength),
                         )
                     }
 
                     "hard" -> {
                         val eolAlphabet = getEolAlphabet(GeneratorMode.HARD, alphabet)
+                        val finalAlphabet = alphabet - eolAlphabet
+                        val maxLexemLength = Random.nextInt(10, 15)
                         Config(
                             mode = GeneratorMode.HARD,
-                            maxParentheses = Random.nextInt(1, 10),
-                            maxLexemLength = Random.nextInt(5, 15),
+                            maxParentheses = Random.nextInt(5, 6),
+                            maxLexemLength = maxLexemLength,
                             eolAlphabet = eolAlphabet,
-                            alphabet = alphabet - eolAlphabet,
-                            lexemSizeMap = generateLexemSizesMap(GeneratorMode.HARD)
+                            alphabet = finalAlphabet,
+                            lexemSizeMap = generateLexemSizesMap(GeneratorMode.HARD, finalAlphabet, maxLexemLength)
                         )
                     }
 
@@ -62,33 +69,36 @@ data class MATAutomaton(
 
             private fun getEolAlphabet(generatorMode: GeneratorMode, alphabet: Set<Int>): Set<Int> {
                 val iterationsNumber = when (generatorMode) {
-                    GeneratorMode.EASY -> 2
-                    GeneratorMode.NORMAL -> 5
-                    GeneratorMode.HARD -> 8
+                    GeneratorMode.EASY -> 6
+                    GeneratorMode.NORMAL -> 4
+                    GeneratorMode.HARD -> 2
                 }
 
-                return alphabet.minus(
-                    generateSequence { Random.nextInt(0, 10) }
+                return generateSequence { Random.nextInt(0, 10) }
                         .take(iterationsNumber)
                         .toSet()
-                )
+
             }
 
-            private fun generateLexemSizesMap(generatorMode: GeneratorMode): Map<Lexems, Lexems.Config> {
+            private fun generateLexemSizesMap(
+                generatorMode: GeneratorMode,
+                alphabet: Set<Int>,
+                maxLexemLength: Int
+            ): Map<Lexems, Lexems.Config> {
                 val (min, max) = when (generatorMode) {
-                    GeneratorMode.EASY -> Pair(2, 5)
-                    GeneratorMode.NORMAL -> Pair(5, 15)
-                    GeneratorMode.HARD -> Pair(15, 50)
+                    GeneratorMode.EASY -> Pair(2, maxLexemLength)
+                    GeneratorMode.NORMAL -> Pair(5, maxLexemLength)
+                    GeneratorMode.HARD -> Pair(8, maxLexemLength)
                 }
                 val lexemMap = mutableMapOf<Lexems, Lexems.Config>()
                 Lexems.entries.forEach { lexem ->
                     val states = Random.nextInt(min, max)
-                    val acceptingStates = when (generatorMode) {
-                        GeneratorMode.EASY -> Random.nextInt(min - 1, states - 1)
-                        GeneratorMode.NORMAL -> Random.nextInt(min - 1, states - 1)
-                        GeneratorMode.HARD -> Random.nextInt(min - 1, states - 1)
-                    }
-                    val maxTransitions = (1..states).sum()
+                    val acceptingStates = (when (generatorMode) {
+                        GeneratorMode.EASY -> Random.nextInt(min - 1, states)
+                        GeneratorMode.NORMAL -> Random.nextInt(min - 1, states)
+                        GeneratorMode.HARD -> Random.nextInt(min - 1, states)
+                    } + 1) / 2
+                    val maxTransitions = (states * alphabet.size) / 2
                     val transitions = Random.nextInt(states - 1, maxTransitions)
                     lexemMap[lexem] = Lexems.Config(
                         states = states,

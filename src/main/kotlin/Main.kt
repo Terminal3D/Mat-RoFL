@@ -1,5 +1,9 @@
-import org.example.models.generateRandomSet
+import dk.brics.automaton.RegExp
+import org.example.generator.AutomatonGenerator
 
 fun main() {
-    println(generateRandomSet(5))
+    for (i in (1..20000)) {
+        AutomatonGenerator().create("easy")
+        println(i)
+    }
 }
