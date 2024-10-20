@@ -1,9 +1,10 @@
-import dk.brics.automaton.RegExp
+import api.module
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import org.example.generator.AutomatonGenerator
 
 fun main() {
-    for (i in (1..20000)) {
-        AutomatonGenerator().create("easy")
-        println(i)
-    }
+    embeddedServer(Netty, port = 8080) {
+        module()
+    }.start(wait = true)
 }

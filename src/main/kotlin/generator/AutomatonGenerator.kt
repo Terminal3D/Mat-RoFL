@@ -85,8 +85,8 @@ class AutomatonGenerator {
         val result = buildProgramAutomaton()
         result.reduce()
 
-        result.determinize()
-        result.minimize()
+//        result.determinize()
+//        result.minimize()
         println("RESULT")
 //        println(result.toDot())
 
@@ -98,6 +98,9 @@ class AutomatonGenerator {
 
 
         println("${result.numberOfStates}, ${result.numberOfTransitions}, ${result.acceptStates.size}, ${config.maxParentheses}")
+        if (result.numberOfStates > 5000) {
+            println("marker")
+        }
         return result
     }
 
@@ -141,26 +144,24 @@ class AutomatonGenerator {
     }
 
     // [program] ::= [eol]*([expression][eol]*)+
-    fun buildProgramAutomaton(): Automaton {
+    private fun buildProgramAutomaton(): Automaton {
         val eolStar = lexemeAutomata[Lexems.EOL]!!.repeat()
-        val expressionAutomaton = buildExpressionEolAutomaton()
+        val expressionAutomaton = buildExpressionEolAutomaton(0)
         val expressionEolStar = expressionAutomaton.concatenate(lexemeAutomata[Lexems.EOL]!!.repeat())
         val expressionEolPlus = expressionEolStar.repeat(1)
         val programAutomaton = eolStar.concatenate(expressionEolPlus)
         return programAutomaton
     }
 
-    // [expression'] ::= [expression][eol] | [eol][expression]
-    fun buildExpressionEolAutomaton(): Automaton {
-        val expr = buildExpressionAutomaton(0)
+    // [expression'] ::= [expression][eol] | [eol][expression] = [eol]*[expression][eol]*
+    private fun buildExpressionEolAutomaton(depth: Int): Automaton {
+        val expr = buildExpressionAutomaton(depth)
         val eolStar = lexemeAutomata[Lexems.EOL]!!.repeat()
-        return eolStar.concatenate(expr).union(expr.concatenate(eolStar))
+        return eolStar.concatenate(expr).concatenate(eolStar)
     }
 
-    //  [expression] ::= [atom]| [eol][expression] | [expression][eol]
-    //  | [lbr] [expression] [dot] [expression] [rbr]
-    //  | [list]
-    fun buildExpressionAutomaton(depth: Int): Automaton {
+    //  [expression] ::= [atom] | [lbr] [expression] [dot] [expression] [rbr] | [list]
+    private fun buildExpressionAutomaton(depth: Int): Automaton {
         if (depth >= config.maxParentheses) {
             // Базовый случай: возвращаем автомат для [atom]
             return lexemeAutomata[Lexems.ATOM]!!.clone()
@@ -173,9 +174,9 @@ class AutomatonGenerator {
 
         // [lbr] [expression] [dot] [expression] [rbr]
         val complexExprAutomaton = lexemeAutomata[Lexems.LBR]!!.clone()
-            .concatenate(buildExpressionAutomaton(depth + 1))
+            .concatenate(buildExpressionEolAutomaton(depth + 1))
             .concatenate(lexemeAutomata[Lexems.DOT]!!.clone())
-            .concatenate(buildExpressionAutomaton(depth + 1))
+            .concatenate(buildExpressionEolAutomaton(depth + 1))
             .concatenate(lexemeAutomata[Lexems.RBR]!!.clone())
         lexemList.add(complexExprAutomaton)
 
@@ -187,9 +188,9 @@ class AutomatonGenerator {
     }
 
     //  [list] ::= [lbr] [expression]+ [rbr]
-    fun buildListAutomaton(depth: Int): Automaton {
+    private fun buildListAutomaton(depth: Int): Automaton {
         val lbr = lexemeAutomata[Lexems.LBR]!!
-        val exprPlus = buildExpressionAutomaton(depth + 1).repeat(1)
+        val exprPlus = buildExpressionEolAutomaton(depth + 1).repeat(1)
         val rbr = lexemeAutomata[Lexems.RBR]!!
         return lbr.concatenate(exprPlus).concatenate(rbr)
     }

@@ -55,7 +55,7 @@ data class MATAutomaton(
                         val maxLexemLength = Random.nextInt(10, 15)
                         Config(
                             mode = GeneratorMode.HARD,
-                            maxParentheses = Random.nextInt(5, 6),
+                            maxParentheses = Random.nextInt(5, 7),
                             maxLexemLength = maxLexemLength,
                             eolAlphabet = eolAlphabet,
                             alphabet = finalAlphabet,

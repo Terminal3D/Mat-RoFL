@@ -13,14 +13,12 @@ class AutomatonGeneratorTest {
     private lateinit var lexemeAutomata: Map<Lexems, Automaton>
     private lateinit var programAutomaton: Automaton
 
-    // Initialize the automata before running tests
     private fun setup() {
-        val matautomaton = automatonGenerator.create("hard")
+        val matautomaton = automatonGenerator.create("normal")
         programAutomaton = matautomaton.automaton
         lexemeAutomata = automatonGenerator.getLexemeAutomata()
     }
 
-    // Helper function to generate a word accepted by a lexeme automaton
     private fun generateWordFromLexeme(lexeme: Lexems): String {
         val automaton = lexemeAutomata[lexeme] ?: error("Automaton for $lexeme not found")
         return automaton.getShortestExample(true)
@@ -28,9 +26,8 @@ class AutomatonGeneratorTest {
 
     @Test
     fun testProgramAutomaton() {
-        setup() // Initialize automata
+        setup()
 
-        // List of expressions to test
         val expressions = listOf(
             listOf(Lexems.ATOM),
             listOf(Lexems.EOL, Lexems.ATOM),
@@ -42,16 +39,13 @@ class AutomatonGeneratorTest {
             listOf(Lexems.EOL, Lexems.LBR, Lexems.ATOM, Lexems.DOT, Lexems.ATOM, Lexems.RBR),
             listOf(Lexems.LBR, Lexems.ATOM, Lexems.DOT, Lexems.ATOM, Lexems.RBR, Lexems.EOL, Lexems.ATOM),
             listOf(Lexems.LBR, Lexems.ATOM, Lexems.DOT, Lexems.ATOM, Lexems.RBR, Lexems.EOL, Lexems.LBR, Lexems.ATOM, Lexems.DOT, Lexems.ATOM, Lexems.RBR),
-            // Add more expressions as needed
         )
 
         for ((index, expression) in expressions.withIndex()) {
-            // Generate the word by concatenating words from lexeme automata
             val word = expression.joinToString(separator = "") { lexeme ->
                 generateWordFromLexeme(lexeme)
             }
 
-            // Check if the word is accepted by the program automaton
             val accepted = programAutomaton.run(word)
             assertTrue(accepted, "Expression $index not accepted: $word")
         }
