@@ -17,10 +17,6 @@ repositories {
 
 dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
-    implementation("net.automatalib:automata-util:0.11.0")
-    implementation("net.automatalib:automata-core:0.11.0")
-    implementation("net.automatalib:automata-dot-visualizer:0.11.0")
-    implementation("net.automatalib.distribution:automata-distribution:0.11.0")
     implementation("io.ktor:ktor-server-core:2.3.3")
     implementation("io.ktor:ktor-server-netty:2.3.3")
     implementation("io.ktor:ktor-server-content-negotiation:2.3.3")

@@ -59,7 +59,7 @@ fun Application.module() {
                     println(automatonFromTable.toDot())
                 }
                 val response = CheckTableResponse(
-                    response = if (!accepted) diff.getShortestExample(true) else "true"
+                    response = if (!accepted) diff.getExample(automaton.config.mode) else "true"
                 )
                 val end = Instant.now()
                 val duration = Duration.between(start, end)
