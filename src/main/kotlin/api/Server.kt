@@ -1,8 +1,5 @@
 package api
 
-import dk.brics.automaton.Automaton
-import dk.brics.automaton.State
-import dk.brics.automaton.Transition
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -61,14 +58,14 @@ fun Application.module() {
     }
 
     routing {
-        post("/check-word") {
+        post("/checkWord") {
             try {
                 val request = call.receive<CheckWordRequest>()
 
                 val accepted = automaton.automaton.run(request.word)
 
                 val response = CheckWordResponse(
-                    accepted = accepted
+                    response = if (accepted) 1 else 0
                 )
                 call.respond(response)
             } catch (e: Exception) {
@@ -79,7 +76,7 @@ fun Application.module() {
             }
         }
 
-        post("/check-table") {
+        post("/checkTable") {
             try {
 
                 val request = call.receive<CheckTableRequest>()
@@ -115,7 +112,7 @@ fun Application.module() {
                 call.respond(response)
             } catch (e: Exception) {
                 call.respond(
-                    status = io.ktor.http.HttpStatusCode.BadRequest,
+                    status = BadRequest,
                     message = mapOf("error" to (e.message ?: "Unknown error"))
                 )
             }
