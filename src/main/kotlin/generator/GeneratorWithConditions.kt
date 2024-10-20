@@ -27,22 +27,15 @@ class GeneratorWithConditions(
      * @param nonIntersectAutomata список автомат с языками которых не должен пересекаться генерируемый автомат
      */
     fun generateWithConditions(nonIntersectAutomata: List<Automaton>): Automaton {
-        var attempt = 0
         while (true) {
-            attempt++
             transitionsAdded = 0
             val candidateAutomaton = generateFiniteAutomaton()
             makeEndStatesAccepting(states[0])
             val intersects = nonIntersectAutomata.any { otherAutomaton ->
-                val t = otherAutomaton.numberOfStates
-                val tr = otherAutomaton.numberOfTransitions
                 !candidateAutomaton.intersection(otherAutomaton).isEmpty
             }
 
             if (!intersects) {
-//                if (attempt > 1) {
-//                    println("Сгенерирован подходящий автомат для ${lexem.toString()} после $attempt попыток")
-//                }
                 return candidateAutomaton
             }
         }

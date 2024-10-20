@@ -20,7 +20,7 @@ data class CheckWordRequest(
 
 @Serializable
 data class CheckWordResponse(
-    val response: Int
+    val response: String
 )
 
 @Serializable

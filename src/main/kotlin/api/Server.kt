@@ -11,44 +11,14 @@ import io.ktor.server.routing.*
 import org.example.generator.AutomatonGenerator
 import org.example.models.MATAutomaton
 import org.slf4j.event.Level
+import java.time.Duration
+import java.time.Instant
 
 
 private lateinit var automaton : MATAutomaton
 
 fun Application.module() {
-//
-//    val etalon = Automaton.makeEmpty()
-//    val stateB2 = State()
-//    val stateA2 = State()
-//    val stateBA2 = State()
-//
-//    etalon.initialState.addTransition(
-//        Transition('a', stateA2)
-//    )
-//
-//    etalon.initialState.addTransition(
-//        Transition('b', stateB2)
-//    )
-//
-//    stateA2.addTransition(
-//        Transition('a', etalon.initialState)
-//    )
-//
-//    stateA2.addTransition(
-//        Transition('b', stateBA2)
-//    )
-//
-//    stateB2.addTransition(
-//        Transition('a', stateBA2)
-//    )
-//
-//    stateBA2.addTransition(
-//        Transition('a', stateB2)
-//    )
-//
-//    stateB2.isAccept = true
-//    println(etalon.toDot())
-//
+
     install(ContentNegotiation) {
         json()
     }
@@ -65,7 +35,7 @@ fun Application.module() {
                 val accepted = automaton.automaton.run(request.word)
 
                 val response = CheckWordResponse(
-                    response = if (accepted) 1 else 0
+                    response = if (accepted) "1" else "0"
                 )
                 call.respond(response)
             } catch (e: Exception) {
@@ -78,17 +48,25 @@ fun Application.module() {
 
         post("/checkTable") {
             try {
-
+                val start = Instant.now()
                 val request = call.receive<CheckTableRequest>()
 
                 val automatonFromTable = request.toAutomaton()
-                println(automatonFromTable.toDot())
                 val diff = automaton.automaton.minus(automatonFromTable)
-//                val accepted = automaton.automaton.minus(automatonFromTable).isEmpty
                 val accepted = diff.isEmpty
+                if (accepted) {
+                    println("Guessed:")
+                    println(automatonFromTable.toDot())
+                }
                 val response = CheckTableResponse(
                     response = if (!accepted) diff.getShortestExample(true) else "true"
                 )
+                val end = Instant.now()
+                val duration = Duration.between(start, end)
+                val totalMillis = duration.toMillis()
+                val seconds = totalMillis / 1000
+                val milliseconds = totalMillis % 1000
+                println("Время обработки: %d:%03d".format(seconds, milliseconds))
                 call.respond(response)
             } catch (e: Exception) {
                 call.respond(
@@ -103,7 +81,6 @@ fun Application.module() {
                 val request = call.receive<GenerateRequest>()
 
                 automaton = AutomatonGenerator().create(request.mode)
-                println(automaton.automaton.toDot())
 
                 val response = GenerateResponse(
                     maxBracketNesting = automaton.config.maxParentheses,

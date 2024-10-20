@@ -89,7 +89,8 @@ private fun CheckTableRequest.map() {
     val numCols = suffixesMapped.size
 
     if (tableValues.size != numRows * numCols) {
-        throw IllegalArgumentException("Размер таблицы не соответствует ожидаемым размерам: ожидается ${numRows * numCols}, получено ${tableValues.size}")
+        throw IllegalArgumentException("Размер таблицы не соответствует ожидаемым размерам: ожидается" +
+                " ${numRows * numCols}, получено ${tableValues.size}")
     }
 
     tableMapped = tableValues.chunked(numCols).map { row -> row.map { it == 1 } }
@@ -100,16 +101,13 @@ private fun parseWords(s: String): List<String> {
     var i = 0
     while (i < s.length) {
         if (s[i] == ' ') {
-            if (i + 1 < s.length && s[i + 1] == ' ') {
-                result.add("")
-                i += 2
-            } else {
-                i += 1
-            }
+            i++
         } else {
             val sb = StringBuilder()
             while (i < s.length && s[i] != ' ') {
-                sb.append(s[i])
+                if (s[i] != 'ε') {
+                    sb.append(s[i])
+                }
                 i += 1
             }
             result.add(sb.toString())

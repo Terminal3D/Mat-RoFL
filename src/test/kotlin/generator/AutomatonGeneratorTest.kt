@@ -3,7 +3,6 @@ package generator
 import dk.brics.automaton.Automaton
 import org.example.generator.AutomatonGenerator
 import org.example.models.Lexems
-import org.example.models.MATAutomaton
 import kotlin.test.Test
 import kotlin.test.assertTrue
 

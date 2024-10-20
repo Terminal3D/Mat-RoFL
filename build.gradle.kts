@@ -27,7 +27,6 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.3")
     implementation("io.ktor:ktor-server-call-logging:2.3.3")
     implementation("dk.brics:automaton:1.12-4")
-
 }
 
 tasks.test {

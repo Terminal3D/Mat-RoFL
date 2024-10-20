@@ -16,7 +16,7 @@ class AutomatonGenerator {
     private val lexemeAutomata = mutableMapOf<Lexems, Automaton>()
 
 
-    fun getLexemeAutomata() : Map<Lexems, Automaton> = lexemeAutomata
+    fun getLexemeAutomata(): Map<Lexems, Automaton> = lexemeAutomata
 
     fun create(mode: String): MATAutomaton {
         config = MATAutomaton.Config.factory(mode)
@@ -74,21 +74,10 @@ class AutomatonGenerator {
                 break
             }
         }
-//        println("EOL")
-//        println(lexemeAutomata[Lexems.EOL]!!.toDot())
-//        println("LBR")
-//        println(lexemeAutomata[Lexems.LBR]!!.toDot())
-//        println("RBR")
-//        println(lexemeAutomata[Lexems.RBR]!!.toDot())
-//        println("ATOM")
-//        println(lexemeAutomata[Lexems.ATOM]!!.toDot())
         val result = buildProgramAutomaton()
         result.reduce()
 
-//        result.determinize()
-//        result.minimize()
         println("RESULT")
-//        println(result.toDot())
 
         println("EOL: ${lexemeAutomata[Lexems.EOL]!!.numberOfStates}, ${lexemeAutomata[Lexems.EOL]!!.numberOfTransitions}, ${lexemeAutomata[Lexems.EOL]!!.acceptStates.size}")
         println("LBR: ${lexemeAutomata[Lexems.LBR]!!.numberOfStates}, ${lexemeAutomata[Lexems.LBR]!!.numberOfTransitions}, ${lexemeAutomata[Lexems.LBR]!!.acceptStates.size}")
@@ -97,10 +86,9 @@ class AutomatonGenerator {
         println("DOT: ${lexemeAutomata[Lexems.DOT]!!.numberOfStates}, ${lexemeAutomata[Lexems.DOT]!!.numberOfTransitions}, ${lexemeAutomata[Lexems.DOT]!!.acceptStates.size}")
 
 
-        println("${result.numberOfStates}, ${result.numberOfTransitions}, ${result.acceptStates.size}, ${config.maxParentheses}")
-        if (result.numberOfStates > 5000) {
-            println("marker")
-        }
+        println("Кол-во состояний: ${result.numberOfStates}, кол-во переходов: ${result.numberOfTransitions}, " +
+                "кол-во принимающих состояний: ${result.acceptStates.size}, " +
+                "макс вложенность скобок: ${config.maxParentheses}")
         return result
     }
 
@@ -163,7 +151,7 @@ class AutomatonGenerator {
     //  [expression] ::= [atom] | [lbr] [expression] [dot] [expression] [rbr] | [list]
     private fun buildExpressionAutomaton(depth: Int): Automaton {
         if (depth >= config.maxParentheses) {
-            // Базовый случай: возвращаем автомат для [atom]
+            // Возвращаем автомат для [atom], когда достигли максимальной вложенности
             return lexemeAutomata[Lexems.ATOM]!!.clone()
         }
 
@@ -183,7 +171,6 @@ class AutomatonGenerator {
         // [list]
         lexemList.add(buildListAutomaton(depth + 1))
 
-        // Объединяем альтернативы с помощью union
         return lexemList.reduce { acc, automaton -> acc.union(automaton) }
     }
 
