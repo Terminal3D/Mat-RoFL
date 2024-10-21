@@ -3,11 +3,8 @@ package generator
 import dk.brics.automaton.Automaton
 import dk.brics.automaton.State
 import dk.brics.automaton.Transition
-import net.automatalib.alphabet.ArrayAlphabet
-import net.automatalib.util.automaton.random.RandomAutomata
-import org.example.generator.AutomatonGenerator.Companion.randomLabel
+import generator.AutomatonGenerator.Companion.randomLabel
 import kotlin.random.Random
-import kotlin.random.asJavaRandom
 
 class AtomGenerator(
     private val statesNum: Int,
@@ -24,12 +21,6 @@ class AtomGenerator(
     private val visitedStatesForMainDFS = mutableSetOf<State>()
     private var counter = 0
     fun generate(): Automaton {
-
-        val alph = ArrayAlphabet(*alphabet.map { it.digitToChar() }.toTypedArray())
-        RandomAutomata.randomDFA(Random.Default.asJavaRandom(), statesNum, alph)
-
-
-
         val automaton = Automaton()
         states = List(statesNum) { State() }
         val startState = states[0]

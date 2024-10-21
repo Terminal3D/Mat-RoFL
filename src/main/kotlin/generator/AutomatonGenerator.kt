@@ -1,12 +1,6 @@
-package org.example.generator
+package generator
 
 import dk.brics.automaton.Automaton
-import generator.AtomGenerator
-import generator.GeneratorWithConditions
-import net.automatalib.alphabet.ArrayAlphabet
-import net.automatalib.brics.BricsNFA
-import net.automatalib.util.automaton.fsa.NFAs
-import net.automatalib.util.automaton.minimizer.hopcroft.HopcroftMinimization
 import org.example.models.Lexems
 import org.example.models.MATAutomaton
 

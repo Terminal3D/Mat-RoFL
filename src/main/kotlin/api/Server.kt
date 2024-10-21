@@ -8,7 +8,7 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.example.generator.AutomatonGenerator
+import generator.AutomatonGenerator
 import org.example.models.MATAutomaton
 import org.slf4j.event.Level
 import java.time.Duration

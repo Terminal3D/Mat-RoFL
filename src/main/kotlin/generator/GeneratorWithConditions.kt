@@ -3,7 +3,6 @@ package generator
 import dk.brics.automaton.Automaton
 import dk.brics.automaton.State
 import dk.brics.automaton.Transition
-import org.example.generator.AutomatonGenerator
 import org.example.models.Lexems
 import kotlin.random.Random
 
