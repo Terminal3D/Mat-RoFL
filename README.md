@@ -47,9 +47,9 @@
 ### Пример входных данных
 ```json
 {
-  "main_prefixes": "  b a ba bb",
+  "main_prefixes": "ε b a ba bb",
   "non_main_prefixes": "aa ab baa bab bba bbb",
-  "suffixes": "  a ba aba",
+  "suffixes": "ε a ba aba",
   "table": "0 0 0 1 1 0 0 0 0 0 1 0 0 1 0 0 0 0 0 0 0 0 0 1 0 1 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
 }
 ```
