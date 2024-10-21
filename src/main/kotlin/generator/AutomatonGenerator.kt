@@ -70,7 +70,8 @@ class AutomatonGenerator {
         }
         val result = buildProgramAutomaton()
         result.reduce()
-
+        result.determinize()
+        result.minimize()
         println("RESULT")
 
         println("EOL: ${lexemeAutomata[Lexems.EOL]!!.numberOfStates}, ${lexemeAutomata[Lexems.EOL]!!.numberOfTransitions}, ${lexemeAutomata[Lexems.EOL]!!.acceptStates.size}")
@@ -78,7 +79,6 @@ class AutomatonGenerator {
         println("RBR: ${lexemeAutomata[Lexems.RBR]!!.numberOfStates}, ${lexemeAutomata[Lexems.RBR]!!.numberOfTransitions}, ${lexemeAutomata[Lexems.RBR]!!.acceptStates.size}")
         println("ATOM: ${lexemeAutomata[Lexems.ATOM]!!.numberOfStates}, ${lexemeAutomata[Lexems.ATOM]!!.numberOfTransitions}, ${lexemeAutomata[Lexems.ATOM]!!.acceptStates.size}")
         println("DOT: ${lexemeAutomata[Lexems.DOT]!!.numberOfStates}, ${lexemeAutomata[Lexems.DOT]!!.numberOfTransitions}, ${lexemeAutomata[Lexems.DOT]!!.acceptStates.size}")
-
 
         println("Кол-во состояний: ${result.numberOfStates}, кол-во переходов: ${result.numberOfTransitions}, " +
                 "кол-во принимающих состояний: ${result.acceptStates.size}, " +

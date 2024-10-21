@@ -35,5 +35,6 @@ data class CheckTableRequest(
 
 @Serializable
 data class CheckTableResponse(
-    val response: String
+    val response: String,
+    val type: String?
 )

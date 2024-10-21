@@ -28,9 +28,9 @@ fun CheckTableRequest.toAutomaton(): Automaton {
 fun Automaton.getExample(mode: GeneratorMode): String {
 
     val minLength = when(mode) {
-        GeneratorMode.EASY -> maxPrefixLength + maxSuffixLength
-        GeneratorMode.NORMAL -> maxPrefixLength
-        GeneratorMode.HARD -> return this.getShortestExample(true)
+        GeneratorMode.EASY -> return this.getShortestExample(true)
+        GeneratorMode.NORMAL -> maxPrefixLength + maxSuffixLength
+        GeneratorMode.HARD -> maxPrefixLength + maxSuffixLength
     }
 
     val maxLength = transitionNum

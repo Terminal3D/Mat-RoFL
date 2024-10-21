@@ -15,7 +15,7 @@ import java.time.Duration
 import java.time.Instant
 
 
-private lateinit var automaton : MATAutomaton
+private lateinit var automaton: MATAutomaton
 
 fun Application.module() {
 
@@ -52,15 +52,36 @@ fun Application.module() {
                 val request = call.receive<CheckTableRequest>()
 
                 val automatonFromTable = request.toAutomaton()
-                val diff = automaton.automaton.minus(automatonFromTable)
-                val accepted = diff.isEmpty
-                if (accepted) {
-                    println("Guessed:")
-                    println(automatonFromTable.toDot())
+
+                val diff1 = automaton.automaton.minus(automatonFromTable)
+
+                val response: CheckTableResponse
+
+                if (!diff1.isEmpty) {
+                    val counterExample = diff1.getExample(automaton.config.mode)
+                    response = CheckTableResponse(
+                        response = counterExample,
+                        type = "+"
+                    )
+                } else {
+                    val diff2 = automatonFromTable.minus(automaton.automaton)
+
+                    if (!diff2.isEmpty) {
+                        val counterExample = diff2.getExample(automaton.config.mode)
+                        response = CheckTableResponse(
+                            response = counterExample,
+                            type = "-"
+                        )
+                    } else {
+                        println("Guessed:")
+                        println(automatonFromTable.toDot())
+
+                        response = CheckTableResponse(
+                            response = "true",
+                            type = null
+                        )
+                    }
                 }
-                val response = CheckTableResponse(
-                    response = if (!accepted) diff.getExample(automaton.config.mode) else "true"
-                )
                 val end = Instant.now()
                 val duration = Duration.between(start, end)
                 val totalMillis = duration.toMillis()
