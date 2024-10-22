@@ -26,8 +26,9 @@ class AutomatonGeneratorTest {
     fun testProgramAutomaton() {
         setup()
 
-        val expressions = listOf(
+        val expressionsValid = listOf(
             listOf(Lexems.ATOM),
+            listOf(Lexems.ATOM, Lexems.ATOM), // Тоже валидно, т.к. [program] ::= [eol]*([expression][eol]*)+
             listOf(Lexems.EOL, Lexems.ATOM),
             listOf(Lexems.ATOM, Lexems.EOL),
             listOf(Lexems.LBR, Lexems.ATOM, Lexems.DOT, Lexems.ATOM, Lexems.RBR),
@@ -39,7 +40,7 @@ class AutomatonGeneratorTest {
             listOf(Lexems.LBR, Lexems.ATOM, Lexems.DOT, Lexems.ATOM, Lexems.RBR, Lexems.EOL, Lexems.LBR, Lexems.ATOM, Lexems.DOT, Lexems.ATOM, Lexems.RBR),
         )
 
-        for ((index, expression) in expressions.withIndex()) {
+        for ((index, expression) in expressionsValid.withIndex()) {
             val word = expression.joinToString(separator = "") { lexeme ->
                 generateWordFromLexeme(lexeme)
             }

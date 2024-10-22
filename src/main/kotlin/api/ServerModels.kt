@@ -36,5 +36,5 @@ data class CheckTableRequest(
 @Serializable
 data class CheckTableResponse(
     val response: String,
-    val type: String?
+    val type: Boolean?
 )

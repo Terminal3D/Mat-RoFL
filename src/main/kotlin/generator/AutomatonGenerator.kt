@@ -9,7 +9,6 @@ class AutomatonGenerator {
     private lateinit var config: MATAutomaton.Config
     private val lexemeAutomata = mutableMapOf<Lexems, Automaton>()
 
-
     fun getLexemeAutomata(): Map<Lexems, Automaton> = lexemeAutomata
 
     fun create(mode: String): MATAutomaton {
@@ -70,19 +69,19 @@ class AutomatonGenerator {
         }
         val result = buildProgramAutomaton()
         result.reduce()
-        result.determinize()
-        result.minimize()
         println("RESULT")
 
         println("EOL: ${lexemeAutomata[Lexems.EOL]!!.numberOfStates}, ${lexemeAutomata[Lexems.EOL]!!.numberOfTransitions}, ${lexemeAutomata[Lexems.EOL]!!.acceptStates.size}")
         println("LBR: ${lexemeAutomata[Lexems.LBR]!!.numberOfStates}, ${lexemeAutomata[Lexems.LBR]!!.numberOfTransitions}, ${lexemeAutomata[Lexems.LBR]!!.acceptStates.size}")
         println("RBR: ${lexemeAutomata[Lexems.RBR]!!.numberOfStates}, ${lexemeAutomata[Lexems.RBR]!!.numberOfTransitions}, ${lexemeAutomata[Lexems.RBR]!!.acceptStates.size}")
-        println("ATOM: ${lexemeAutomata[Lexems.ATOM]!!.numberOfStates}, ${lexemeAutomata[Lexems.ATOM]!!.numberOfTransitions}, ${lexemeAutomata[Lexems.ATOM]!!.acceptStates.size}")
+        println("ATOM (Максимально возможные, не обязательно соответсвуют реальному автомату): ${lexemeAutomata[Lexems.ATOM]!!.numberOfStates}, ${lexemeAutomata[Lexems.ATOM]!!.numberOfTransitions}, ${lexemeAutomata[Lexems.ATOM]!!.acceptStates.size}")
         println("DOT: ${lexemeAutomata[Lexems.DOT]!!.numberOfStates}, ${lexemeAutomata[Lexems.DOT]!!.numberOfTransitions}, ${lexemeAutomata[Lexems.DOT]!!.acceptStates.size}")
 
-        println("Кол-во состояний: ${result.numberOfStates}, кол-во переходов: ${result.numberOfTransitions}, " +
+        println(
+            "Кол-во состояний: ${result.numberOfStates}, кол-во переходов: ${result.numberOfTransitions}, " +
                 "кол-во принимающих состояний: ${result.acceptStates.size}, " +
-                "макс вложенность скобок: ${config.maxParentheses}")
+                "макс вложенность скобок: ${config.maxParentheses}"
+        )
         return result
     }
 

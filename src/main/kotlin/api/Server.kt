@@ -61,7 +61,7 @@ fun Application.module() {
                     val counterExample = diff1.getExample(automaton.config.mode)
                     response = CheckTableResponse(
                         response = counterExample,
-                        type = "+"
+                        type = true
                     )
                 } else {
                     val diff2 = automatonFromTable.minus(automaton.automaton)
@@ -70,7 +70,7 @@ fun Application.module() {
                         val counterExample = diff2.getExample(automaton.config.mode)
                         response = CheckTableResponse(
                             response = counterExample,
-                            type = "-"
+                            type = false
                         )
                     } else {
                         println("Guessed:")

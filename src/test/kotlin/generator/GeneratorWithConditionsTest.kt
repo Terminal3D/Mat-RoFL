@@ -23,7 +23,7 @@ class GeneratorWithConditionsTest {
             val automaton = generator.generateWithConditions(emptyList())
 
             val hasCycles = hasCycles(automaton)
-            assertFalse(hasCycles,"Автомат содержит цикл",)
+            assertFalse(hasCycles, "Автомат содержит цикл")
         }
     }
 
