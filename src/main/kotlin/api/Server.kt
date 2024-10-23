@@ -27,6 +27,9 @@ fun Application.module() {
         level = Level.INFO
     }
 
+    var checkTableCounter = 0
+    var checkWord = 0
+
     routing {
         post("/checkWord") {
             try {
@@ -36,6 +39,23 @@ fun Application.module() {
 
                 val response = CheckWordResponse(
                     response = if (accepted) "1" else "0"
+                )
+                checkWord++
+                call.respond(response)
+            } catch (e: Exception) {
+                call.respond(
+                    status = BadRequest,
+                    message = mapOf("error" to (e.message ?: "Unknown error"))
+                )
+            }
+        }
+
+        post("/check-table-batch") {
+            try {
+                val request = call.receive<CheckWordBatchRequest>()
+
+                val response = CheckWordBatchResponse(
+                    responseList = request.wordList.map { automaton.automaton.run(it) }
                 )
                 call.respond(response)
             } catch (e: Exception) {
@@ -75,7 +95,7 @@ fun Application.module() {
                     } else {
                         println("Guessed:")
                         println(automatonFromTable.toDot())
-
+                        println("Table:$checkTableCounter, word:$checkWord")
                         response = CheckTableResponse(
                             response = "true",
                             type = null
@@ -88,6 +108,7 @@ fun Application.module() {
                 val seconds = totalMillis / 1000
                 val milliseconds = totalMillis % 1000
                 println("Время обработки: %d:%03d".format(seconds, milliseconds))
+                checkTableCounter++
                 call.respond(response)
             } catch (e: Exception) {
                 call.respond(

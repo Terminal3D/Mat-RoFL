@@ -19,6 +19,16 @@ data class CheckWordRequest(
 )
 
 @Serializable
+data class CheckWordBatchRequest(
+    val wordList: List<String>
+)
+
+@Serializable
+data class CheckWordBatchResponse(
+    val responseList: List<Boolean>
+)
+
+@Serializable
 data class CheckWordResponse(
     val response: String
 )
