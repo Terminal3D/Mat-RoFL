@@ -50,7 +50,7 @@ fun Application.module() {
             }
         }
 
-        post("/check-table-batch") {
+        post("/check-word-batch") {
             try {
                 val request = call.receive<CheckWordBatchRequest>()
 
