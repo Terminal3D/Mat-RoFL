@@ -35,6 +35,7 @@ class GeneratorWithConditions(
             }
 
             if (!intersects) {
+                candidateAutomaton.minimize()
                 return candidateAutomaton
             }
         }

@@ -9,7 +9,6 @@ class AutomatonGenerator {
     private lateinit var config: MATAutomaton.Config
     private val lexemeAutomata = mutableMapOf<Lexems, Automaton>()
 
-
     fun getLexemeAutomata(): Map<Lexems, Automaton> = lexemeAutomata
 
     fun create(mode: String): MATAutomaton {
@@ -70,7 +69,6 @@ class AutomatonGenerator {
         }
         val result = buildProgramAutomaton()
         result.reduce()
-
         println("RESULT")
 
         println("EOL: ${lexemeAutomata[Lexems.EOL]!!.numberOfStates}, ${lexemeAutomata[Lexems.EOL]!!.numberOfTransitions}, ${lexemeAutomata[Lexems.EOL]!!.acceptStates.size}")
@@ -79,10 +77,11 @@ class AutomatonGenerator {
         println("ATOM: ${lexemeAutomata[Lexems.ATOM]!!.numberOfStates}, ${lexemeAutomata[Lexems.ATOM]!!.numberOfTransitions}, ${lexemeAutomata[Lexems.ATOM]!!.acceptStates.size}")
         println("DOT: ${lexemeAutomata[Lexems.DOT]!!.numberOfStates}, ${lexemeAutomata[Lexems.DOT]!!.numberOfTransitions}, ${lexemeAutomata[Lexems.DOT]!!.acceptStates.size}")
 
-
-        println("Кол-во состояний: ${result.numberOfStates}, кол-во переходов: ${result.numberOfTransitions}, " +
+        println(
+            "Кол-во состояний: ${result.numberOfStates}, кол-во переходов: ${result.numberOfTransitions}, " +
                 "кол-во принимающих состояний: ${result.acceptStates.size}, " +
-                "макс вложенность скобок: ${config.maxParentheses}")
+                "макс вложенность скобок: ${config.maxParentheses}"
+        )
         return result
     }
 
