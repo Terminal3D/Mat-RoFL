@@ -1,21 +1,22 @@
 package generator
 
 import dk.brics.automaton.Automaton
-import org.example.models.Lexems
+import generator.random.RandomAutomatonGenerator
+import models.Lexems
 import org.junit.jupiter.api.Assertions.assertFalse
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-class AutomatonGeneratorTest {
+class RandomAutomatonGeneratorTest {
 
-    private val automatonGenerator = AutomatonGenerator()
+    private val randomAutomatonGenerator = RandomAutomatonGenerator()
     private lateinit var lexemeAutomata: Map<Lexems, Automaton>
     private lateinit var programAutomaton: Automaton
 
     private fun setup() {
-        val matautomaton = automatonGenerator.create("normal")
+        val matautomaton = randomAutomatonGenerator.create("normal")
         programAutomaton = matautomaton.automaton
-        lexemeAutomata = automatonGenerator.getLexemeAutomata()
+        lexemeAutomata = randomAutomatonGenerator.getLexemeAutomata()
     }
 
     private fun generateWordFromLexeme(lexeme: Lexems): String {

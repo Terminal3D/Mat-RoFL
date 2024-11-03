@@ -1,18 +1,18 @@
-package generator
+package generator.random
 
 import dk.brics.automaton.Automaton
 import dk.brics.automaton.State
 import dk.brics.automaton.Transition
-import org.example.models.Lexems
+import models.Lexems
 import kotlin.random.Random
 
-class GeneratorWithConditions(
+class RandomGeneratorWithConditions(
     private val statesNum: Int,
     private val transitions: Int,
     private val acceptingStatesNum: Int,
     private val alphabet: Set<Int>,
     private val lexem: Lexems
-) : AbstractGenerator(
+) : RandomAbstractGenerator(
     statesNum = statesNum,
     transitions = transitions,
     acceptingStatesNum = acceptingStatesNum,
@@ -68,7 +68,7 @@ class GeneratorWithConditions(
     private fun addTransition(transition: Edge) {
         if (usedLabels[transition.from] == null) usedLabels[transition.from] = mutableSetOf()
         val nonAvailableLabels = usedLabels[transition.from]!!
-        AutomatonGenerator.randomLabel(alphabet, nonAvailableLabels)?.let {
+        RandomAutomatonGenerator.randomLabel(alphabet, nonAvailableLabels)?.let {
             transition.from.addTransition(
                 Transition(
                     it.digitToChar(),
@@ -82,7 +82,7 @@ class GeneratorWithConditions(
 
 fun main() {
     println(
-        GeneratorWithConditions(
+        RandomGeneratorWithConditions(
             statesNum = 10,
             transitions = 30,
             acceptingStatesNum = 10,

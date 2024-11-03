@@ -1,10 +1,7 @@
-package org.example.models
+package models
 
 enum class Lexems {
-    PROGRAM,
-    EXPRESSION,
     ATOM,
-    LIST,
     LBR,
     RBR,
     EOL,
@@ -12,7 +9,8 @@ enum class Lexems {
 
     data class Config(
         val states: Int,
-        val transitions: Int,
-        val acceptingStates: Int
+        val transitionsNum: Int? = null,
+        val acceptingStates: Int? = null,
+        val transitions: List<Int> = emptyList()
     )
 }

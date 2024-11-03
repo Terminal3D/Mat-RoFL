@@ -1,8 +1,8 @@
-package generator
+package generator.random
 
 import dk.brics.automaton.State
 
-abstract class AbstractGenerator(
+abstract class RandomAbstractGenerator(
     private val statesNum: Int,
     private val transitions: Int,
     private val acceptingStatesNum: Int,

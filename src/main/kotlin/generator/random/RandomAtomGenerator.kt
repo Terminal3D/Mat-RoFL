@@ -1,17 +1,17 @@
-package generator
+package generator.random
 
 import dk.brics.automaton.Automaton
 import dk.brics.automaton.State
 import dk.brics.automaton.Transition
-import generator.AutomatonGenerator.Companion.randomLabel
+import generator.random.RandomAutomatonGenerator.Companion.randomLabel
 import kotlin.random.Random
 
-class AtomGenerator(
+class RandomAtomGenerator(
     private val statesNum: Int,
     private val transitions: Int,
     private val acceptingStatesNum: Int,
     private val alphabet: Set<Int>
-) : AbstractGenerator(
+) : RandomAbstractGenerator(
     statesNum = statesNum,
     transitions = transitions,
     acceptingStatesNum = acceptingStatesNum,
@@ -129,7 +129,7 @@ class AtomGenerator(
 
 fun main() {
     for (i in (1..1000)) {
-        AtomGenerator(
+        RandomAtomGenerator(
             statesNum = 3,
             transitions = 2,
             alphabet = (2..9).toSet(),

@@ -5,7 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GenerateRequest(
-    val mode: String
+    val mode: String,
+    val size: Int? = null
 )
 
 @Serializable

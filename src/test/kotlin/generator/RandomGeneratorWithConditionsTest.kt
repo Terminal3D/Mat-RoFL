@@ -2,18 +2,19 @@ package generator
 
 import dk.brics.automaton.Automaton
 import dk.brics.automaton.State
-import org.example.models.Lexems
+import generator.random.RandomGeneratorWithConditions
+import models.Lexems
 import org.junit.jupiter.api.Test
 import kotlin.random.Random
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class GeneratorWithConditionsTest {
+class RandomGeneratorWithConditionsTest {
 
     @Test
     fun testNoCycles() {
         for (i in 1..100) {
-            val generator = GeneratorWithConditions(
+            val generator = RandomGeneratorWithConditions(
                 statesNum = Random.nextInt(5, 15),
                 transitions = Random.nextInt(5, 30),
                 acceptingStatesNum = Random.nextInt(1, 5),
@@ -56,7 +57,7 @@ class GeneratorWithConditionsTest {
     fun testNonIntersectingAutomata() {
         val nonIntersectAutomata = mutableListOf<Automaton>()
         for (i in 1..10) {
-            val generator = GeneratorWithConditions(
+            val generator = RandomGeneratorWithConditions(
                 statesNum = Random.nextInt(5, 15),
                 transitions = Random.nextInt(5, 30),
                 acceptingStatesNum = Random.nextInt(1, 5),
@@ -67,7 +68,7 @@ class GeneratorWithConditionsTest {
             nonIntersectAutomata.add(automaton)
         }
 
-        val generator = GeneratorWithConditions(
+        val generator = RandomGeneratorWithConditions(
             statesNum = Random.nextInt(5, 15),
             transitions = Random.nextInt(5, 30),
             acceptingStatesNum = Random.nextInt(1, 5),

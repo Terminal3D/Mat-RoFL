@@ -1,120 +1,320 @@
 package org.example.models
 
 import dk.brics.automaton.Automaton
+import models.Lexems
 import java.util.*
 import kotlin.math.max
 import kotlin.random.Random
 
 data class MATAutomaton(
     val automaton: Automaton,
-    val config: MATAutomaton.Config,
+    val config: Config,
 ) {
-    data class Config(
-        val mode: GeneratorMode,
-        val maxParentheses: Int,
-        val maxLexemLength: Int,
-        val eolAlphabet: Set<Int>,
-        val alphabet: Set<Int>,
-        val lexemSizeMap: Map<Lexems, Lexems.Config>
+
+    sealed class Config(
+        open val maxLexemeLength: Int,
+        open val maxParentheses: Int,
+        open val mode: GeneratorMode
     ) {
-        companion object {
-            fun factory(mode: String): Config {
-                val alphabet = (0..9).toSet()
-                return when (mode.lowercase(Locale.getDefault())) {
-                    "easy" -> {
-                        val eolAlphabet = getEolAlphabet(GeneratorMode.EASY, alphabet)
-                        val finalAlphabet = alphabet - eolAlphabet
-                        val maxLexemLength = Random.nextInt(3, 7)
-                        Config(
-                            mode = GeneratorMode.EASY,
-                            maxParentheses = Random.nextInt(1,3),
-                            maxLexemLength = maxLexemLength,
-                            eolAlphabet = eolAlphabet,
-                            alphabet = finalAlphabet,
-                            lexemSizeMap = generateLexemSizesMap(GeneratorMode.EASY, finalAlphabet, maxLexemLength),
-                        )
-                    }
+        data class RandomConfig(
+            override val mode: GeneratorMode,
+            override val maxParentheses: Int,
+            override val maxLexemeLength: Int,
+            val eolAlphabet: Set<Int>,
+            val alphabet: Set<Int>,
+            val lexemeMap: Map<Lexems, Lexems.Config>
+        ) : Config(maxLexemeLength, maxParentheses, mode) {
+            companion object {
+                fun factory(mode: String): RandomConfig {
+                    val alphabet = (0..9).toSet()
+                    return when (mode.lowercase(Locale.getDefault())) {
+                        "easy" -> {
+                            val eolAlphabet = getEolAlphabet(GeneratorMode.EASY, alphabet)
+                            val finalAlphabet = alphabet - eolAlphabet
+                            val maxLexemLength = Random.nextInt(3, 7)
+                            RandomConfig(
+                                mode = GeneratorMode.EASY,
+                                maxParentheses = Random.nextInt(1, 3),
+                                maxLexemeLength = maxLexemLength,
+                                eolAlphabet = eolAlphabet,
+                                alphabet = finalAlphabet,
+                                lexemeMap = generateLexemSizesMap(GeneratorMode.EASY, finalAlphabet, maxLexemLength),
+                            )
+                        }
 
-                    "normal" -> {
-                        val eolAlphabet = getEolAlphabet(GeneratorMode.NORMAL, alphabet)
-                        val finalAlphabet = alphabet - eolAlphabet
-                        val maxLexemLength = Random.nextInt(7, 10)
-                        Config(
-                            mode = GeneratorMode.NORMAL,
-                            maxParentheses = Random.nextInt(3, 5),
-                            maxLexemLength = maxLexemLength,
-                            eolAlphabet = eolAlphabet,
-                            alphabet = finalAlphabet,
-                            lexemSizeMap = generateLexemSizesMap(GeneratorMode.NORMAL, finalAlphabet, maxLexemLength),
-                        )
-                    }
+                        "normal" -> {
+                            val eolAlphabet = getEolAlphabet(GeneratorMode.NORMAL, alphabet)
+                            val finalAlphabet = alphabet - eolAlphabet
+                            val maxLexemLength = Random.nextInt(7, 10)
+                            RandomConfig(
+                                mode = GeneratorMode.NORMAL,
+                                maxParentheses = Random.nextInt(3, 5),
+                                maxLexemeLength = maxLexemLength,
+                                eolAlphabet = eolAlphabet,
+                                alphabet = finalAlphabet,
+                                lexemeMap = generateLexemSizesMap(
+                                    GeneratorMode.NORMAL,
+                                    finalAlphabet,
+                                    maxLexemLength
+                                ),
+                            )
+                        }
 
-                    "hard" -> {
-                        val eolAlphabet = getEolAlphabet(GeneratorMode.HARD, alphabet)
-                        val finalAlphabet = alphabet - eolAlphabet
-                        val maxLexemLength = Random.nextInt(10, 15)
-                        Config(
-                            mode = GeneratorMode.HARD,
-                            maxParentheses = Random.nextInt(5, 7),
-                            maxLexemLength = maxLexemLength,
-                            eolAlphabet = eolAlphabet,
-                            alphabet = finalAlphabet,
-                            lexemSizeMap = generateLexemSizesMap(GeneratorMode.HARD, finalAlphabet, maxLexemLength)
-                        )
-                    }
+                        "hard" -> {
+                            val eolAlphabet = getEolAlphabet(GeneratorMode.HARD, alphabet)
+                            val finalAlphabet = alphabet - eolAlphabet
+                            val maxLexemLength = Random.nextInt(10, 15)
+                            RandomConfig(
+                                mode = GeneratorMode.HARD,
+                                maxParentheses = Random.nextInt(5, 7),
+                                maxLexemeLength = maxLexemLength,
+                                eolAlphabet = eolAlphabet,
+                                alphabet = finalAlphabet,
+                                lexemeMap = generateLexemSizesMap(GeneratorMode.HARD, finalAlphabet, maxLexemLength)
+                            )
+                        }
 
-                    else -> throw Exception("Некорректный режим")
+                        else -> throw Exception("Некорректный режим")
+                    }
                 }
-            }
 
-            private fun getEolAlphabet(generatorMode: GeneratorMode, alphabet: Set<Int>): Set<Int> {
-                val iterationsNumber = when (generatorMode) {
-                    GeneratorMode.EASY -> 6
-                    GeneratorMode.NORMAL -> 4
-                    GeneratorMode.HARD -> 2
-                }
+                private fun getEolAlphabet(generatorMode: GeneratorMode, alphabet: Set<Int>): Set<Int> {
+                    val iterationsNumber = when (generatorMode) {
+                        GeneratorMode.EASY -> 6
+                        GeneratorMode.NORMAL -> 4
+                        GeneratorMode.HARD -> 2
+                        else -> throw Exception("Некорректный режим")
+                    }
 
-                return generateSequence { Random.nextInt(0, 10) }
+                    return generateSequence { Random.nextInt(0, 10) }
                         .take(iterationsNumber)
                         .toSet()
-
-            }
-
-            private fun generateLexemSizesMap(
-                generatorMode: GeneratorMode,
-                alphabet: Set<Int>,
-                maxLexemLength: Int
-            ): Map<Lexems, Lexems.Config> {
-                val (min, max) = when (generatorMode) {
-                    GeneratorMode.EASY -> Pair(2, maxLexemLength)
-                    GeneratorMode.NORMAL -> Pair(5, maxLexemLength)
-                    GeneratorMode.HARD -> Pair(8, maxLexemLength)
                 }
-                val lexemMap = mutableMapOf<Lexems, Lexems.Config>()
-                Lexems.entries.forEach { lexem ->
-                    val states = Random.nextInt(min, max)
-                    val acceptingStates = (when (generatorMode) {
-                        GeneratorMode.EASY -> Random.nextInt(min - 1, states)
-                        GeneratorMode.NORMAL -> Random.nextInt(min - 1, states)
-                        GeneratorMode.HARD -> Random.nextInt(min - 1, states)
-                    } + 1) / 2
-                    val maxTransitions = (states * alphabet.size) / 2
-                    val transitions = Random.nextInt(states - 1, maxTransitions)
-                    lexemMap[lexem] = Lexems.Config(
-                        states = states,
-                        transitions = transitions,
-                        acceptingStates = acceptingStates
+
+                private fun generateLexemSizesMap(
+                    generatorMode: GeneratorMode,
+                    alphabet: Set<Int>,
+                    maxLexemLength: Int
+                ): Map<Lexems, Lexems.Config> {
+                    val (min, max) = when (generatorMode) {
+                        GeneratorMode.EASY -> Pair(2, maxLexemLength)
+                        GeneratorMode.NORMAL -> Pair(5, maxLexemLength)
+                        GeneratorMode.HARD -> Pair(8, maxLexemLength)
+                        else -> throw Exception("Некорректный режим")
+                    }
+                    val lexemMap = mutableMapOf<Lexems, Lexems.Config>()
+                    Lexems.entries.forEach { lexem ->
+                        val states = Random.nextInt(min, max)
+                        val acceptingStates = (when (generatorMode) {
+                            GeneratorMode.EASY -> Random.nextInt(min - 1, states)
+                            GeneratorMode.NORMAL -> Random.nextInt(min - 1, states)
+                            GeneratorMode.HARD -> Random.nextInt(min - 1, states)
+                            else -> throw Exception("Некорректный режим")
+                        } + 1) / 2
+                        val maxTransitions = (states * alphabet.size) / 2
+                        val transitions = Random.nextInt(states - 1, maxTransitions)
+                        lexemMap[lexem] = Lexems.Config(
+                            states = states,
+                            transitionsNum = transitions,
+                            acceptingStates = acceptingStates
+                        )
+                    }
+                    return lexemMap
+                }
+            }
+        }
+
+        data class FixedConfig(
+            override val mode: GeneratorMode,
+            override val maxParentheses: Int,
+            override val maxLexemeLength: Int,
+            val lexemeMap: Map<Lexems, Lexems.Config>,
+        ) : Config(maxLexemeLength, maxParentheses, mode) {
+            companion object {
+
+                private var lexemeLengthsResults: Pair<Int, Int>? = null
+
+                fun factory(size: Int): FixedConfig {
+
+                    val (lexMap, maxLexemeLength, maxParentheses) = when {
+                        size < 2 -> throw Exception("У автомата должно быть минимум 2 состояния")
+                        size == 3 -> throw Exception("Невозможно сгенерировать автомат с 3 состояниями")
+                        size in (2..10) -> {
+                            val lexemeLength = if (size % 2 == 0) size / 2 else size / 3
+                            val specLexemeLength = if (size % 2 == 0) 1 else 2
+                            Triple(
+                                totallyDisjoint(
+                                    lexemeLength = lexemeLength,
+                                    specLexeme = Lexems.ATOM,
+                                    specLexemeLength = specLexemeLength,
+                                    isAtomSingleState = false
+                                ),
+                                max(lexemeLength, specLexemeLength),
+                                0
+                            )
+                        }
+                        /**
+                         * Длинная (неоптимальная проверка), позволяющая с большой вероятностью сгенерировать
+                         * автомат с нетривиальными размерами автоматов лексем и максимальным количеством скобок
+                         * (т.е. > 2 и > 1 соответственно). Проверки устроены так, что сверху вниз проверяются
+                         * условия в зависимости от трудности их выполнения
+                         */
+                        else -> {
+                            val (lexemeLength, maxParentheses, specLexemeLength) = when {
+                                size >= 560 && findLexemeLengthsForSize(560, 441, 64, size) != null -> {
+                                    val (lexemeLength, specLexemeLength) = lexemeLengthsResults!!
+                                    Triple(
+                                        lexemeLength,
+                                        5,
+                                        specLexemeLength
+                                    )
+                                }
+
+                                size >= 560 && (size - 560) % 64 == 0 -> {
+                                    Triple(
+                                        1,
+                                        5,
+                                        (size - 560) / 64 + 1
+                                    )
+                                }
+
+                                size >= 213 && findLexemeLengthsForSize(213, 168, 24, size) != null -> {
+                                    val (lexemeLength, specLexemeLength) = lexemeLengthsResults!!
+                                    Triple(
+                                        lexemeLength,
+                                        4,
+                                        specLexemeLength
+                                    )
+                                }
+
+                                size >= 213 && (size - 213) % 24 == 0 -> {
+                                    Triple(
+                                        1,
+                                        4,
+                                        (size - 213) / 24 + 1
+                                    )
+                                }
+
+                                size >= 81 && findLexemeLengthsForSize(81, 64, 9, size) != null -> {
+                                    val (lexemeLength, specLexemeLength) = lexemeLengthsResults!!
+                                    Triple(
+                                        lexemeLength,
+                                        3,
+                                        specLexemeLength
+                                    )
+                                }
+                                size >= 81 && (size - 81) % 9 == 0 -> {
+                                    Triple(
+                                        1,
+                                        3,
+                                        (size - 81) / 9 + 1
+                                    )
+                                }
+
+                                size >= 30 && findLexemeLengthsForSize(30, 24, 3, size) != null -> {
+                                    val (lexemeLength, specLexemeLength) = lexemeLengthsResults!!
+                                    Triple(
+                                        lexemeLength,
+                                        2,
+                                        specLexemeLength
+                                    )
+                                }
+
+                                size >= 30 && size % 3 == 0 -> Triple(1, 2, (size - 30) / 3 + 1)
+                                findLexemeLengthsForSize(11, 9, 1, size) != null -> {
+                                    val (lexemeLength, specLexemeLength) = lexemeLengthsResults!!
+                                    Triple(
+                                        lexemeLength,
+                                        1,
+                                        specLexemeLength
+                                    )
+                                }
+
+                                else -> {
+                                    Triple(1, 1, size - 10)
+                                }
+                            }
+
+                            Triple(
+                                totallyDisjoint(
+                                    lexemeLength = lexemeLength,
+                                    specLexeme = Lexems.DOT,
+                                    specLexemeLength = specLexemeLength
+                                ),
+                                max(lexemeLength, specLexemeLength),
+                                maxParentheses
+                            )
+                        }
+                    }
+
+
+
+                    return FixedConfig(
+                        mode = GeneratorMode.FIXED,
+                        maxLexemeLength = maxLexemeLength,
+                        maxParentheses = maxParentheses,
+                        lexemeMap = lexMap
                     )
                 }
-                return lexemMap
-            }
 
+                private fun findLexemeLengthsForSize(
+                    initialAutomatonSize: Int,
+                    lexemeIncrement: Int,
+                    specLexemeIncrement: Int,
+                    size: Int
+                ): Pair<Int, Int>? {
+                    val C = initialAutomatonSize - lexemeIncrement - specLexemeIncrement
+                    val T = size - C
+                    for (lexemeLength in 1..(T / lexemeIncrement)) {
+                        val remainder = T - lexemeIncrement * lexemeLength
+                        if (remainder % specLexemeIncrement == 0) {
+                            val specLexemeLength = remainder / specLexemeIncrement
+                            if (specLexemeLength >= 1) {
+                                println("Lexeme length: $lexemeLength, SpecLexemeLength: $specLexemeLength")
+                                lexemeLengthsResults = Pair(lexemeLength, specLexemeLength)
+                                return Pair(lexemeLength, specLexemeLength)
+                            }
+                        }
+                    }
+                    lexemeLengthsResults = null
+                    return null
+                }
+
+                private fun totallyDisjoint(
+                    lexemeLength: Int,
+                    specLexeme: Lexems,
+                    specLexemeLength: Int,
+                    isAtomSingleState: Boolean = true
+                ): Map<Lexems, Lexems.Config> {
+                    val alphabet = (0..9).toMutableSet()
+                    val lexMap = mutableMapOf<Lexems, Lexems.Config>()
+                    Lexems.entries.forEach { lexeme ->
+                        val lexemeAlphabet = alphabet.asSequence().take(2).toSet()
+                        alphabet -= lexemeAlphabet
+                        val transitions =
+                            if (isAtomSingleState && lexeme == Lexems.ATOM) {
+                                listOf(lexemeAlphabet.random())
+                            } else {
+                                List(if (lexeme == specLexeme) specLexemeLength else lexemeLength) { lexemeAlphabet.random() }
+                            }
+
+                        lexMap[lexeme] = Lexems.Config(
+                            states = transitions.size + 1,
+                            transitionsNum = transitions.size,
+                            acceptingStates = 1,
+                            transitions = transitions
+                        )
+                    }
+
+                    return lexMap
+                }
+            }
         }
     }
 }
 
 enum class GeneratorMode {
-    EASY, NORMAL, HARD
+    EASY, NORMAL, HARD, FIXED
 }
 
 fun generateRandomSet(size: Int): Set<Int> =

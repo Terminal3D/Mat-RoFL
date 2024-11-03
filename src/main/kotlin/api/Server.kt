@@ -1,5 +1,6 @@
 package api
 
+import generator.fixed.FixedAutomatonGenerator
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -8,7 +9,7 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import generator.AutomatonGenerator
+import generator.random.RandomAutomatonGenerator
 import org.example.models.MATAutomaton
 import org.slf4j.event.Level
 import java.time.Duration
@@ -122,11 +123,15 @@ fun Application.module() {
             try {
                 val request = call.receive<GenerateRequest>()
 
-                automaton = AutomatonGenerator().create(request.mode)
+                automaton = if (request.size == null) {
+                    RandomAutomatonGenerator().create(request.mode)
+                } else {
+                    FixedAutomatonGenerator().create(request.size)
+                }
 
                 val response = GenerateResponse(
                     maxBracketNesting = automaton.config.maxParentheses,
-                    maxLexemeSize = automaton.config.maxLexemLength
+                    maxLexemeSize = automaton.config.maxLexemeLength
                 )
                 call.respond(response)
             } catch (e: Exception) {

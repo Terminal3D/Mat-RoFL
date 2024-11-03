@@ -31,6 +31,7 @@ fun Automaton.getExample(mode: GeneratorMode): String {
         GeneratorMode.EASY -> return this.getShortestExample(true)
         GeneratorMode.NORMAL -> maxPrefixLength + maxSuffixLength
         GeneratorMode.HARD -> maxPrefixLength + maxSuffixLength
+        GeneratorMode.FIXED -> return this.getShortestExample(true)
     }
 
     val maxLength = transitionNum

@@ -1,61 +1,62 @@
-package generator
+package generator.random
 
 import dk.brics.automaton.Automaton
-import org.example.models.Lexems
+import generator.buildProgramAutomaton
+import models.Lexems
 import org.example.models.MATAutomaton
 
-class AutomatonGenerator {
+class RandomAutomatonGenerator {
 
-    private lateinit var config: MATAutomaton.Config
+    private lateinit var config: MATAutomaton.Config.RandomConfig
     private val lexemeAutomata = mutableMapOf<Lexems, Automaton>()
 
     fun getLexemeAutomata(): Map<Lexems, Automaton> = lexemeAutomata
 
     fun create(mode: String): MATAutomaton {
-        config = MATAutomaton.Config.factory(mode)
-        val automaton = generateAutomaton(config)
+        config = MATAutomaton.Config.RandomConfig.factory(mode)
+        val automaton = generateAutomaton()
         return MATAutomaton(
             automaton = automaton,
             config = config
         )
     }
 
-    private fun generateAutomaton(config: MATAutomaton.Config): Automaton {
+    private fun generateAutomaton(): Automaton {
         lexemeAutomata[Lexems.ATOM] = generateAtomAutomaton(
-            statesNum = config.lexemSizeMap[Lexems.ATOM]?.states ?: 2,
-            transitionsNum = config.lexemSizeMap[Lexems.ATOM]?.transitions ?: 1,
-            acceptingStatesNum = config.lexemSizeMap[Lexems.ATOM]?.acceptingStates ?: 1,
+            statesNum = config.lexemeMap[Lexems.ATOM]?.states ?: 2,
+            transitionsNum = config.lexemeMap[Lexems.ATOM]?.transitionsNum ?: 1,
+            acceptingStatesNum = config.lexemeMap[Lexems.ATOM]?.acceptingStates ?: 1,
             alphabet = config.alphabet
         )
         lexemeAutomata[Lexems.EOL] = generateWithConditions(
-            statesNum = config.lexemSizeMap[Lexems.EOL]?.states ?: 2,
-            transitionsNum = config.lexemSizeMap[Lexems.EOL]?.transitions ?: 1,
-            acceptingStatesNum = config.lexemSizeMap[Lexems.EOL]?.acceptingStates ?: 1,
+            statesNum = config.lexemeMap[Lexems.EOL]?.states ?: 2,
+            transitionsNum = config.lexemeMap[Lexems.EOL]?.transitionsNum ?: 1,
+            acceptingStatesNum = config.lexemeMap[Lexems.EOL]?.acceptingStates ?: 1,
             alphabet = config.eolAlphabet,
             nonIntersectAutomata = emptyList(),
             lexem = Lexems.EOL
         )
         lexemeAutomata[Lexems.DOT] = generateWithConditions(
-            statesNum = config.lexemSizeMap[Lexems.DOT]?.states ?: 2,
-            transitionsNum = config.lexemSizeMap[Lexems.DOT]?.transitions ?: 1,
-            acceptingStatesNum = config.lexemSizeMap[Lexems.DOT]?.acceptingStates ?: 1,
+            statesNum = config.lexemeMap[Lexems.DOT]?.states ?: 2,
+            transitionsNum = config.lexemeMap[Lexems.DOT]?.transitionsNum ?: 1,
+            acceptingStatesNum = config.lexemeMap[Lexems.DOT]?.acceptingStates ?: 1,
             alphabet = config.alphabet,
             nonIntersectAutomata = listOf(lexemeAutomata[Lexems.ATOM]!!),
             lexem = Lexems.DOT
         )
         while (true) {
             val lbr = generateWithConditions(
-                statesNum = config.lexemSizeMap[Lexems.LBR]?.states ?: 2,
-                transitionsNum = config.lexemSizeMap[Lexems.LBR]?.transitions ?: 1,
-                acceptingStatesNum = config.lexemSizeMap[Lexems.LBR]?.acceptingStates ?: 1,
+                statesNum = config.lexemeMap[Lexems.LBR]?.states ?: 2,
+                transitionsNum = config.lexemeMap[Lexems.LBR]?.transitionsNum ?: 1,
+                acceptingStatesNum = config.lexemeMap[Lexems.LBR]?.acceptingStates ?: 1,
                 alphabet = config.alphabet,
                 nonIntersectAutomata = listOf(lexemeAutomata[Lexems.ATOM]!!),
                 lexem = Lexems.LBR
             )
             val rbr = generateWithConditions(
-                statesNum = config.lexemSizeMap[Lexems.RBR]?.states ?: 2,
-                transitionsNum = config.lexemSizeMap[Lexems.RBR]?.transitions ?: 1,
-                acceptingStatesNum = config.lexemSizeMap[Lexems.RBR]?.acceptingStates ?: 1,
+                statesNum = config.lexemeMap[Lexems.RBR]?.states ?: 2,
+                transitionsNum = config.lexemeMap[Lexems.RBR]?.transitionsNum ?: 1,
+                acceptingStatesNum = config.lexemeMap[Lexems.RBR]?.acceptingStates ?: 1,
                 alphabet = config.alphabet,
                 nonIntersectAutomata = listOf(lexemeAutomata[Lexems.ATOM]!!, lbr),
                 lexem = Lexems.RBR
@@ -67,7 +68,10 @@ class AutomatonGenerator {
                 break
             }
         }
-        val result = buildProgramAutomaton()
+        val result = buildProgramAutomaton(
+            lexemeAutomataMap = lexemeAutomata,
+            maxParenthesesValue = config.maxParentheses
+        )
         result.reduce()
         println("RESULT")
 
@@ -92,7 +96,7 @@ class AutomatonGenerator {
         alphabet: Set<Int>,
         nonIntersectAutomata: List<Automaton>,
         lexem: Lexems
-    ) = GeneratorWithConditions(
+    ) = RandomGeneratorWithConditions(
         statesNum = statesNum,
         transitions = transitionsNum,
         acceptingStatesNum = acceptingStatesNum,
@@ -107,7 +111,7 @@ class AutomatonGenerator {
         transitionsNum: Int,
         acceptingStatesNum: Int,
         alphabet: Set<Int>,
-    ) = AtomGenerator(
+    ) = RandomAtomGenerator(
         statesNum = statesNum,
         transitions = transitionsNum,
         acceptingStatesNum = acceptingStatesNum,
@@ -122,56 +126,5 @@ class AutomatonGenerator {
             }
             return available.random()
         }
-    }
-
-    // [program] ::= [eol]*([expression][eol]*)+
-    private fun buildProgramAutomaton(): Automaton {
-        val eolStar = lexemeAutomata[Lexems.EOL]!!.repeat()
-        val expressionAutomaton = buildExpressionEolAutomaton(0)
-        val expressionEolStar = expressionAutomaton.concatenate(lexemeAutomata[Lexems.EOL]!!.repeat())
-        val expressionEolPlus = expressionEolStar.repeat(1)
-        val programAutomaton = eolStar.concatenate(expressionEolPlus)
-        return programAutomaton
-    }
-
-    // [expression'] ::= [expression][eol] | [eol][expression] = [eol]*[expression][eol]*
-    private fun buildExpressionEolAutomaton(depth: Int): Automaton {
-        val expr = buildExpressionAutomaton(depth)
-        val eolStar = lexemeAutomata[Lexems.EOL]!!.repeat()
-        return eolStar.concatenate(expr).concatenate(eolStar)
-    }
-
-    //  [expression] ::= [atom] | [lbr] [expression] [dot] [expression] [rbr] | [list]
-    private fun buildExpressionAutomaton(depth: Int): Automaton {
-        if (depth >= config.maxParentheses) {
-            // Возвращаем автомат для [atom], когда достигли максимальной вложенности
-            return lexemeAutomata[Lexems.ATOM]!!.clone()
-        }
-
-        val lexemList = mutableListOf<Automaton>()
-
-        // [atom]
-        lexemList.add(lexemeAutomata[Lexems.ATOM]!!.clone())
-
-        // [lbr] [expression] [dot] [expression] [rbr]
-        val complexExprAutomaton = lexemeAutomata[Lexems.LBR]!!.clone()
-            .concatenate(buildExpressionEolAutomaton(depth + 1))
-            .concatenate(lexemeAutomata[Lexems.DOT]!!.clone())
-            .concatenate(buildExpressionEolAutomaton(depth + 1))
-            .concatenate(lexemeAutomata[Lexems.RBR]!!.clone())
-        lexemList.add(complexExprAutomaton)
-
-        // [list]
-        lexemList.add(buildListAutomaton(depth + 1))
-
-        return lexemList.reduce { acc, automaton -> acc.union(automaton) }
-    }
-
-    //  [list] ::= [lbr] [expression]+ [rbr]
-    private fun buildListAutomaton(depth: Int): Automaton {
-        val lbr = lexemeAutomata[Lexems.LBR]!!
-        val exprPlus = buildExpressionEolAutomaton(depth + 1).repeat(1)
-        val rbr = lexemeAutomata[Lexems.RBR]!!
-        return lbr.concatenate(exprPlus).concatenate(rbr)
     }
 }
