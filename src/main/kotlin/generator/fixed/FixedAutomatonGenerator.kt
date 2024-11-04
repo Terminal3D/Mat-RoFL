@@ -49,8 +49,8 @@ class FixedAutomatonGenerator {
     private fun generateLexemeAutomaton(config: Lexems.Config, addCycle: Boolean): Automaton {
         val automaton = Automaton.makeEmpty()
         var state = automaton.initialState
-        val alphabet = config.transitions
-        alphabet.forEach { label ->
+        val transitions = config.transitions
+        transitions.forEach { label ->
             val newState = State()
             state.addTransition(
                 Transition(
@@ -64,7 +64,7 @@ class FixedAutomatonGenerator {
         if (addCycle) {
             state.addTransition(
                 Transition(
-                    alphabet.random().digitToChar(),
+                    transitions.random().digitToChar(),
                     automaton.initialState
                 )
             )

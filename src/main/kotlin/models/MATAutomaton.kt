@@ -134,6 +134,24 @@ data class MATAutomaton(
 
                 private var lexemeLengthsResults: Pair<Int, Int>? = null
 
+                private const val ONE_PAR_TRIVIAL_STATES_NUM = 11
+                private const val TWO_PAR_TRIVIAL_STATES_NUM = 30
+                private const val THREE_PAR_TRIVIAL_STATES_NUM = 81
+                private const val FOUR_PAR_TRIVIAL_STATES_NUM = 213
+                private const val FIVE_PAR_TRIVIAL_STATES_NUM = 560
+
+                private const val ONE_PAR_LEXEME_INCREMENT = 9
+                private const val TWO_PAR_LEXEME_INCREMENT = 24
+                private const val THREE_PAR_LEXEME_INCREMENT = 64
+                private const val FOUR_PAR_LEXEME_INCREMENT = 168
+                private const val FIVE_PAR_LEXEME_INCREMENT = 441
+
+                private const val ONE_PAR_SPEC_LEXEME_INCREMENT = 1
+                private const val TWO_PAR_SPEC_LEXEME_INCREMENT = 3
+                private const val THREE_PAR_SPEC_LEXEME_INCREMENT = 9
+                private const val FOUR_PAR_SPEC_LEXEME_INCREMENT = 24
+                private const val FIVE_PAR_SPEC_LEXEME_INCREMENT = 64
+
                 fun factory(size: Int): FixedConfig {
 
                     val (lexMap, maxLexemeLength, maxParentheses) = when {
@@ -161,7 +179,12 @@ data class MATAutomaton(
                          */
                         else -> {
                             val (lexemeLength, maxParentheses, specLexemeLength) = when {
-                                size >= 560 && findLexemeLengthsForSize(560, 441, 64, size) != null -> {
+                                size >= 560 && findLexemeLengthsForSize(
+                                    FIVE_PAR_TRIVIAL_STATES_NUM,
+                                    FIVE_PAR_LEXEME_INCREMENT,
+                                    FIVE_PAR_SPEC_LEXEME_INCREMENT,
+                                    size
+                                ) != null -> {
                                     val (lexemeLength, specLexemeLength) = lexemeLengthsResults!!
                                     Triple(
                                         lexemeLength,
@@ -170,15 +193,12 @@ data class MATAutomaton(
                                     )
                                 }
 
-                                size >= 560 && (size - 560) % 64 == 0 -> {
-                                    Triple(
-                                        1,
-                                        5,
-                                        (size - 560) / 64 + 1
-                                    )
-                                }
-
-                                size >= 213 && findLexemeLengthsForSize(213, 168, 24, size) != null -> {
+                                size >= 213 && findLexemeLengthsForSize(
+                                    FOUR_PAR_TRIVIAL_STATES_NUM,
+                                    FOUR_PAR_LEXEME_INCREMENT,
+                                    FOUR_PAR_SPEC_LEXEME_INCREMENT,
+                                    size
+                                ) != null -> {
                                     val (lexemeLength, specLexemeLength) = lexemeLengthsResults!!
                                     Triple(
                                         lexemeLength,
@@ -187,15 +207,12 @@ data class MATAutomaton(
                                     )
                                 }
 
-                                size >= 213 && (size - 213) % 24 == 0 -> {
-                                    Triple(
-                                        1,
-                                        4,
-                                        (size - 213) / 24 + 1
-                                    )
-                                }
-
-                                size >= 81 && findLexemeLengthsForSize(81, 64, 9, size) != null -> {
+                                size >= 81 && findLexemeLengthsForSize(
+                                    THREE_PAR_TRIVIAL_STATES_NUM,
+                                    THREE_PAR_LEXEME_INCREMENT,
+                                    THREE_PAR_SPEC_LEXEME_INCREMENT,
+                                    size
+                                ) != null -> {
                                     val (lexemeLength, specLexemeLength) = lexemeLengthsResults!!
                                     Triple(
                                         lexemeLength,
@@ -203,15 +220,13 @@ data class MATAutomaton(
                                         specLexemeLength
                                     )
                                 }
-                                size >= 81 && (size - 81) % 9 == 0 -> {
-                                    Triple(
-                                        1,
-                                        3,
-                                        (size - 81) / 9 + 1
-                                    )
-                                }
 
-                                size >= 30 && findLexemeLengthsForSize(30, 24, 3, size) != null -> {
+                                size >= 30 && findLexemeLengthsForSize(
+                                    TWO_PAR_TRIVIAL_STATES_NUM,
+                                    TWO_PAR_LEXEME_INCREMENT,
+                                    TWO_PAR_SPEC_LEXEME_INCREMENT,
+                                    size
+                                ) != null -> {
                                     val (lexemeLength, specLexemeLength) = lexemeLengthsResults!!
                                     Triple(
                                         lexemeLength,
@@ -220,8 +235,12 @@ data class MATAutomaton(
                                     )
                                 }
 
-                                size >= 30 && size % 3 == 0 -> Triple(1, 2, (size - 30) / 3 + 1)
-                                findLexemeLengthsForSize(11, 9, 1, size) != null -> {
+                                findLexemeLengthsForSize(
+                                    ONE_PAR_TRIVIAL_STATES_NUM,
+                                    ONE_PAR_LEXEME_INCREMENT,
+                                    ONE_PAR_SPEC_LEXEME_INCREMENT,
+                                    size
+                                ) != null -> {
                                     val (lexemeLength, specLexemeLength) = lexemeLengthsResults!!
                                     Triple(
                                         lexemeLength,
